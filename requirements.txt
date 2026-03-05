@@ -1,0 +1,9 @@
+Flask==3.0.0
+Flask-Cors==4.0.0
+opencv-python==4.8.1.78
+deepface==0.0.86
+ultralytics==8.1.0
+numpy==1.26.4
+retina-face>=0.0.14
+gunicorn==21.2.0
+mediapipe==0.10.9

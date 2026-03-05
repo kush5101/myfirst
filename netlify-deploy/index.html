@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Real-time AI-powered employee monitoring with emotion detection and efficiency scoring.">
+    <title>EmoSense AI — Employee Monitoring</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="app-container">
+
+        <!-- ── Navbar ── -->
+        <header class="navbar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i data-lucide="scan-face"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">EmoSense AI</span>
+                    <span class="logo-subtitle">Employee Monitoring</span>
+                </div>
+            </div>
+
+            <div class="navbar-right">
+                <div class="live-badge" id="live-badge">
+                    <span class="live-dot"></span>
+                    <span>SYSTEM LIVE</span>
+                </div>
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
+                    <i data-lucide="sun" id="theme-icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ── Tab Navigation ── -->
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tab-live">
+                <i data-lucide="video"></i> Live Camera
+            </button>
+            <button class="tab-btn" id="tab-video">
+                <i data-lucide="file-video"></i> Video Analysis
+            </button>
+        </div>
+
+        <!-- ══════════════════════════ LIVE CAMERA TAB ══════════════════════════ -->
+        <main class="main-content" id="live-view">
+
+            <!-- Left: Camera Feed -->
+            <section class="panel camera-panel">
+                <div class="panel-header">
+                    <h2><i data-lucide="aperture"></i> Live Camera Feed</h2>
+                    <div class="status-badge" id="camera-status">
+                        <span class="dot disconnected"></span>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                </div>
+
+                <!-- Warning Banners -->
+                <div id="phone-warning-banner" class="warning-banner phone-warn hidden">
+                    <i data-lucide="smartphone"></i>
+                    <span>📵 PHONE DETECTED — Employee is distracted!</span>
+                </div>
+                <div id="social-warning-banner" class="warning-banner social-warn hidden">
+                    <i data-lucide="users"></i>
+                    <span>👥 MULTIPLE PEOPLE — Chatting / Socializing detected</span>
+                </div>
+                <div id="waste-warning-banner" class="warning-banner waste-warn hidden">
+                    <i data-lucide="coffee"></i>
+                    <span>☕ BREAK TIME — Non-work items detected</span>
+                </div>
+
+                <!-- Camera View -->
+                <div class="camera-container">
+                    <div id="camera-placeholder" class="placeholder">
+                        <div class="placeholder-icon-wrap">
+                            <i data-lucide="video"></i>
+                        </div>
+                        <p>Allow camera access to begin real-time emotion & efficiency monitoring.</p>
+                        <button id="start-btn" class="primary-btn">
+                            <i data-lucide="play"></i> Start Camera
+                        </button>
+                    </div>
+
+                    <div id="video-wrapper" class="hidden">
+                        <video id="webcam" autoplay playsinline></video>
+                        <canvas id="overlay"></canvas>
+                        <div class="video-controls">
+                            <button id="stop-btn" class="icon-btn danger" title="Stop Camera">
+                                <i data-lucide="square"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right: Analysis Dashboard -->
+            <section class="panel results-panel">
+                <div class="panel-header">
+                    <h2><i data-lucide="activity"></i> Analysis</h2>
+                    <div class="loader-container">
+                        <div id="prediction-loader" class="loader hidden"></div>
+                        <span id="prediction-status" class="status-text">Waiting for face…</span>
+                    </div>
+                </div>
+
+                <!-- Work State -->
+                <div class="state-card">
+                    <div class="state-label">
+                        <i data-lucide="zap"></i> CURRENT WORK STATE
+                    </div>
+                    <div id="live-state-value" class="state-value">Idle</div>
+                </div>
+
+                <!-- Metric Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Detected Emotion</span>
+                        <div class="metric-value" id="emotion-value">--</div>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Confidence</span>
+                        <div class="metric-value">
+                            <span id="confidence-value">--</span><span class="percent">%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="confidence-fill" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emotion Breakdown -->
+                <div>
+                    <div class="section-header">
+                        <i data-lucide="bar-chart-2"></i> Emotion Breakdown
+                    </div>
+                    <div class="bar-chart" id="emotion-bars"></div>
+                </div>
+
+                <!-- History Log -->
+                <div>
+                    <div class="section-header">
+                        <i data-lucide="clock"></i> Detection History
+                    </div>
+                    <ul class="history-list" id="history-log"></ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- ══════════════════════════ VIDEO ANALYSIS TAB ══════════════════════════ -->
+        <main class="main-content hidden" id="video-view">
+
+            <!-- Left: Upload -->
+            <section class="panel camera-panel">
+                <div class="panel-header">
+                    <h2><i data-lucide="upload-cloud"></i> Upload Video</h2>
+                </div>
+
+                <div class="upload-container" id="upload-zone">
+                    <input type="file" id="video-upload-input" accept="video/mp4,video/x-m4v,video/*" class="hidden">
+                    <div class="upload-content">
+                        <div class="upload-icon-wrap">
+                            <i data-lucide="upload-cloud"></i>
+                        </div>
+                        <p class="upload-text">Drag &amp; Drop your video file here</p>
+                        <span class="upload-or">or</span>
+                        <button class="primary-btn" id="browse-btn">
+                            <i data-lucide="folder-open"></i> Browse Files
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Video Preview -->
+                <div id="video-preview-wrapper" class="hidden">
+                    <video id="uploaded-video-preview" controls></video>
+                    <button class="primary-btn" id="analyze-video-btn">
+                        <i data-lucide="activity"></i> Analyze Employee Efficiency
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right: Video Results -->
+            <section class="panel results-panel">
+                <div class="panel-header">
+                    <h2><i data-lucide="award"></i> Efficiency Results</h2>
+                    <div class="loader-container">
+                        <div id="video-prediction-loader" class="loader hidden"></div>
+                        <span id="video-prediction-status" class="status-text">Awaiting upload…</span>
+                    </div>
+                </div>
+
+                <!-- Efficiency Score Card -->
+                <div class="efficiency-card">
+                    <!-- SVG gradient def -->
+                    <svg width="0" height="0">
+                        <defs>
+                            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#38bdf8" />
+                                <stop offset="100%" stop-color="#8b5cf6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+
+                    <div class="efficiency-header">
+                        <i data-lucide="award"></i> Employee Efficiency Score
+                    </div>
+
+                    <div class="efficiency-score-row">
+                        <div class="efficiency-value-wrapper">
+                            <span class="efficiency-value" id="efficiency-score-value">--</span>
+                            <span class="efficiency-percent">%</span>
+                        </div>
+
+                        <!-- Circular progress ring -->
+                        <div class="score-ring-wrap">
+                            <svg class="score-ring" width="70" height="70" viewBox="0 0 70 70">
+                                <circle class="score-ring-bg" cx="35" cy="35" r="30" />
+                                <circle class="score-ring-fill" id="score-ring-fill" cx="35" cy="35" r="30" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <p class="efficiency-subtitle">Based on emotion engagement, phone usage, socialising, and break-time
+                        detection.</p>
+
+                    <!-- Extra stats -->
+                    <div class="efficiency-stats">
+                        <div class="eff-stat">
+                            <span class="eff-stat-val" id="stat-frames">0</span>
+                            <span class="eff-stat-lbl">Frames</span>
+                        </div>
+                        <div class="eff-stat">
+                            <span class="eff-stat-val" id="stat-phone">0</span>
+                            <span class="eff-stat-lbl">Phone Frames</span>
+                        </div>
+                        <div class="eff-stat">
+                            <span class="eff-stat-val" id="stat-chat">0</span>
+                            <span class="eff-stat-lbl">Social Frames</span>
+                        </div>
+                        <div class="eff-stat">
+                            <span class="eff-stat-val" id="stat-laptop">0</span>
+                            <span class="eff-stat-lbl">Laptop Frames</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overall Breakdown -->
+                <div>
+                    <div class="section-header">
+                        <i data-lucide="bar-chart-2"></i>
+                        Overall Breakdown (<span id="total-frames-analyzed">0</span> valid frames)
+                    </div>
+                    <div class="bar-chart" id="video-emotion-bars"></div>
+                </div>
+            </section>
+        </main>
+
+    </div><!-- /.app-container -->
+
+    <script src="script.js"></script>
+</body>
+
+</html>
