@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: emosense-ai
-    env: docker
-    plan: free # Note: Free tier may have memory limits for YOLO/DeepFace
-    region: oregon
-    staticPublishDir: static
-    buildCommand: ""
-    startCommand: "" # Dockerfile handles the start command
